@@ -3,10 +3,14 @@ from websocket import WebSocketApp
 import json
 
 def on_message(ws, message):
+    print("FTX")
     message = json.loads(message)
     market = message['market']
-    for info in message['data']:
-        print(f"{info['time']}    {market}  {info['price']}")
+    if not 'data' in message.keys():
+       print("FTX Subscription successfull")
+    else:
+        for info in message['data']:
+            print(f"FTx       {info['time']}    {market}  {info['price']}")
         
 
 def on_error(ws, error):
@@ -35,15 +39,19 @@ def on_open(ws):
    
     
 class FTXClient(WebSocketApp):
-    
-    def __init__(self):
+    def __init__(self,rel):
         super().__init__("wss://ftx.com/ws/",
                             on_open=on_open,
                             on_ping = on_ping,
                             on_message=on_message,
                             on_error=on_error,
                             on_close=on_close)
-        super().run_forever(ping_interval=10)
+        super().run_forever(ping_interval=10,dispatcher=rel)
+
+def initializeFTX(rel):
+    client = FTXClient(rel)
+    
+
 
 if __name__ == "__main__":
     # websocket.enableTrace(True)
