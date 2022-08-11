@@ -4,13 +4,14 @@ from websocket._abnf import ABNF
 import json
 
 def on_message(ws, message):
-    print('BINANCE')
+    # print('BINANCE')
     message = json.loads(message)
     if not 's' in message.keys():
-        print(message)
+        # print(message)
         return
     else:
         time,market,price = message['E'],message['s'],message['p']
+        # ws.price.add(time,price,market)
         print(f"BINANCE     {time} {market}  {price}")
         
 
@@ -56,7 +57,8 @@ def on_open(ws):
     
 class Binance(WebSocketApp):
     
-    def __init__(self,rel):
+    def __init__(self,rel,price):
+        self.price = price
         super().__init__("wss://stream.binance.com:9443/ws",
                             on_open=on_open,
                             on_ping = on_ping,
@@ -65,8 +67,8 @@ class Binance(WebSocketApp):
                             on_close=on_close)
         super().run_forever(ping_interval=10,dispatcher=rel)
 
-def initializeBinance(rel):
-    client = Binance(rel)
+def initializeBinance(rel,price):
+    client = Binance(rel,price)
 
 
 if __name__ == "__main__":

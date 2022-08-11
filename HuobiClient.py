@@ -18,11 +18,12 @@ def decompress(message):
 
 
 def on_message(ws, message):
-    print("HUOBI")
+    # print("HUOBI")
+    # global prices
     dict_data = decompress(message)
     if 'ping' in dict_data.keys():
         pong_payload = json.dumps({"pong":dict_data['ping']})
-        print(pong_payload)
+        # print(pong_payload)
         ws.send(pong_payload)
     elif 'ch' in dict_data.keys():
         market = dict_data['ch']
@@ -33,10 +34,10 @@ def on_message(ws, message):
             times.append(time)
             prices.append(price)
             print(f" HUOBI      {time}  {market}  {price}")    
+            ws.prices.add(time,price)
     elif 'status' in dict_data.keys():
         print("Subscribtion successful",dict_data['subbed'])
     else:
-        
         print(dict_data)   
 
 def on_error(ws, error):
@@ -82,7 +83,8 @@ def on_open(ws):
     
 class Huobi(WebSocketApp):
     
-    def __init__(self,rel):
+    def __init__(self,rel,price_store):
+        self.prices = price_store
         super().__init__("wss://api.huobi.pro/ws",
                             on_open=on_open,
                             on_message=on_message,
@@ -90,8 +92,8 @@ class Huobi(WebSocketApp):
                             on_close=on_close)
         super().run_forever(dispatcher=rel)
 
-def initializeHuobi(rel):
-    client = Huobi(rel)
+def initializeHuobi(rel,price_store):
+    client = Huobi(rel,price_store)
 
 if __name__ == "__main__":
     # websocket.enableTrace(True)
