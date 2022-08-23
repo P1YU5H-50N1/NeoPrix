@@ -1,5 +1,7 @@
 import websocket
 from websocket import WebSocketApp
+from datetime import datetime 
+import sys
 import json
 
 def on_message(ws, message):
@@ -10,13 +12,13 @@ def on_message(ws, message):
        print("FTX Subscription successfull")
     else:
         for info in message['data']:
-            
-            # print(f"FTx       {info['time']}    {market}  {info['price']}")
-            ws.prices.add(info['time'],info['price'],market)
+            time_stamp = datetime.strptime(info['time'],"%Y-%m-%dT%H:%M:%S.%f%z").timestamp()
+            ws.prices.add(info['time'],info['price'],market,'FTX')
         
 
 def on_error(ws, error):
-    print(error)
+    print("FTX ERR",error)
+    sys.exit()
 
 def on_close(ws, close_status_code, close_msg):
     unsubscribe = ['{"op": "unsubscribe", "channel": "trades", "market": "BTC/USD"}',

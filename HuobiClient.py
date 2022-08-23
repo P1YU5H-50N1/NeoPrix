@@ -3,11 +3,12 @@ from websocket import WebSocketApp
 from websocket._abnf import ABNF
 import gzip
 from datetime import datetime
-
+import sys
 import json
 
+
 def decompress(message):
-    if isinstance(message, (str)): 
+    if isinstance(message, (str)):
         dict_data = json.loads(message)
     elif isinstance(message, (bytes)):
         dict_data = json.loads(gzip.decompress(message).decode("utf-8"))
@@ -22,7 +23,7 @@ def on_message(ws, message):
     # global prices
     dict_data = decompress(message)
     if 'ping' in dict_data.keys():
-        pong_payload = json.dumps({"pong":dict_data['ping']})
+        pong_payload = json.dumps({"pong": dict_data['ping']})
         # print(pong_payload)
         ws.send(pong_payload)
     elif 'ch' in dict_data.keys():
@@ -31,18 +32,20 @@ def on_message(ws, message):
         prices = []
         for i in dict_data['tick']['data']:
             time, price = i['ts'], i['price']
-            times.append(time)
+            times.append(time/100)
             prices.append(price)
-            print(f" HUOBI      {time}  {market}  {price}")    
-            ws.prices.add(time,price)
+            ws.prices.add(time, price, market,'HUOBI')
     elif 'status' in dict_data.keys():
-        print("Subscribtion successful",dict_data['subbed'])
+        print("Subscribtion successful", dict_data['subbed'])
     else:
-        print(dict_data)   
+        print(dict_data)
+
 
 def on_error(ws, error):
-    
-    print('err',type(error),error)
+
+    print('HUOBI ERR', type(error), error)
+    sys.exit()
+
 
 def on_close(ws, close_status_code, close_msg):
     now = datetime.now()
@@ -50,7 +53,6 @@ def on_close(ws, close_status_code, close_msg):
     current_time = now.strftime("%H:%M:%S")
     print("CLOSE TIME =", current_time)
     print("### closed ###")
-
 
 
 def on_open(ws):
@@ -61,39 +63,39 @@ def on_open(ws):
     current_time = now.strftime("%H:%M:%S")
     print("OPEN TIME =", current_time)
     subscribe = [
-                {
-                "sub": "market.btcusdt.trade.detail",
-                "id": "id1"
-                },
-                {
-                "sub": "market.maticusdt.trade.detail",
-                "id": "id1"
-                },
-                {
-                "sub": "market.ethusdt.trade.detail",
-                "id": "id1"
-                }
-                 ]
+        {
+            "sub": "market.btcusdt.trade.detail",
+            "id": "id1"
+        },
+        {
+            "sub": "market.maticusdt.trade.detail",
+            "id": "id1"
+        },
+        {
+            "sub": "market.ethusdt.trade.detail",
+            "id": "id1"
+        }
+    ]
     for sub in subscribe:
         payload = json.dumps(sub)
         ws.send(payload)
 
-    
-   
-    
+
 class Huobi(WebSocketApp):
-    
-    def __init__(self,rel,price_store):
+
+    def __init__(self, rel, price_store):
         self.prices = price_store
         super().__init__("wss://api.huobi.pro/ws",
-                            on_open=on_open,
-                            on_message=on_message,
-                            on_error=on_error,
-                            on_close=on_close)
+                         on_open=on_open,
+                         on_message=on_message,
+                         on_error=on_error,
+                         on_close=on_close)
         super().run_forever(dispatcher=rel)
 
-def initializeHuobi(rel,price_store):
-    client = Huobi(rel,price_store)
+
+def initializeHuobi(rel, price_store):
+    client = Huobi(rel, price_store)
+
 
 if __name__ == "__main__":
     # websocket.enableTrace(True)
