@@ -22,28 +22,28 @@ def on_message(ws, message):
     # print("HUOBI")
     # global prices
     dict_data = decompress(message)
-    if 'ping' in dict_data.keys():
-        pong_payload = json.dumps({"pong": dict_data['ping']})
+    if "ping" in dict_data.keys():
+        pong_payload = json.dumps({"pong": dict_data["ping"]})
         # print(pong_payload)
         ws.send(pong_payload)
-    elif 'ch' in dict_data.keys():
-        market = dict_data['ch']
+    elif "ch" in dict_data.keys():
+        market = dict_data["ch"]
         times = []
         prices = []
-        for i in dict_data['tick']['data']:
-            time, price = i['ts'], i['price']
-            times.append(time/100)
+        for i in dict_data["tick"]["data"]:
+            time, price = i["ts"], i["price"]
+            times.append(time / 100)
             prices.append(price)
-            ws.prices.add(time, price, market,'HUOBI')
-    elif 'status' in dict_data.keys():
-        print("Subscribtion successful", dict_data['subbed'])
+            ws.prices.add(time, price, market, "HUOBI")
+    elif "status" in dict_data.keys():
+        print("Subscribtion successful", dict_data["subbed"])
     else:
         print(dict_data)
 
 
 def on_error(ws, error):
 
-    print('HUOBI ERR', type(error), error)
+    print("HUOBI ERR", type(error), error)
     sys.exit()
 
 
@@ -63,18 +63,9 @@ def on_open(ws):
     current_time = now.strftime("%H:%M:%S")
     print("OPEN TIME =", current_time)
     subscribe = [
-        {
-            "sub": "market.btcusdt.trade.detail",
-            "id": "id1"
-        },
-        {
-            "sub": "market.maticusdt.trade.detail",
-            "id": "id1"
-        },
-        {
-            "sub": "market.ethusdt.trade.detail",
-            "id": "id1"
-        }
+        {"sub": "market.btcusdt.trade.detail", "id": "id1"},
+        {"sub": "market.maticusdt.trade.detail", "id": "id1"},
+        {"sub": "market.ethusdt.trade.detail", "id": "id1"},
     ]
     for sub in subscribe:
         payload = json.dumps(sub)
@@ -82,14 +73,15 @@ def on_open(ws):
 
 
 class Huobi(WebSocketApp):
-
     def __init__(self, rel, price_store):
         self.prices = price_store
-        super().__init__("wss://api.huobi.pro/ws",
-                         on_open=on_open,
-                         on_message=on_message,
-                         on_error=on_error,
-                         on_close=on_close)
+        super().__init__(
+            "wss://api.huobi.pro/ws",
+            on_open=on_open,
+            on_message=on_message,
+            on_error=on_error,
+            on_close=on_close,
+        )
         super().run_forever(dispatcher=rel)
 
 
