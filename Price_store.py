@@ -1,32 +1,37 @@
 from threading import Lock
 import json
 from datetime import datetime
+from copy import deepcopy
 
 
 class Price_store:
 
     def __init__(self):
         self.symbols = {
-            "BTCUSDT": "BTC/USD",
-            "ETHUSDT": "ETH/USD",
-            "MATICUSDT": "MATIC/USD",
-            "BTC/USD": "BTC/USD",
-            "ETH/USD": "ETH/USD",
-            "MATIC/USD": "MATIC/USD",
-            "market.btcusdt.trade.detail": "BTC/USD",
-            "market.maticusdt.trade.detail": "ETH/USD",
-            "market.ethusdt.trade.detail": "MATIC/USD"
+            "BTCUSDT": "BTC",
+            "ETHUSDT": "ETH",
+            "MATICUSDT": "MATIC",
+            "BTC/USD": "BTC",
+            "ETH/USD": "ETH",
+            "MATIC/USD": "MATIC",
+            "market.btcusdt.trade.detail": "BTC",
+            "market.maticusdt.trade.detail": "MATIC",
+            "market.ethusdt.trade.detail": "ETH"
         }
-        self.store = {i: {} for i in ["BTC/USD", "ETH/USD", "MATIC/USD"]}       
+        self.store = {i: {} for i in ["BTC", "ETH", "MATIC"]}       
         self.lock = Lock()
         self.len = 1
 
-    def __getitem__(self, market):
-        while self.lock.locked():
-            continue
+    def getLock(self):
+        return self.lock
+    def pop(self,market,ts):
         with self.lock:
-            return self.store[market]
+            del self.store[market][ts]
 
+    def __getitem__(self, market):
+        with self.lock:
+            t = deepcopy(self.store[market])
+        return t
     def add(self, time, price, market, client):
         with self.lock:
             if client == 'FTX':
@@ -38,8 +43,8 @@ class Price_store:
             if client == 'BINANCE':
                 price = float(price)
             # print(f"{client}   {int(datetime.now().timestamp())}  CURRENT")
-            print(
-                f"{client}   {time}   {self.symbols[market]}  {price} {type(price)}")
+            # print(
+            #     f"{client}   {time}   {self.symbols[market]}  {price} {type(price)}")
             if time in self.store[self.symbols[market]]:
                 last_avg_price, num_prices = self.store[self.symbols[market]][time]
                 new_avg_price = ((last_avg_price*num_prices) +
