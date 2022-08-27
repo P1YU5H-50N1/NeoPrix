@@ -69,9 +69,6 @@ class Aggregator:
             # print(ohlc)
             self.ohlc.add(ohlc)
             self.ohlc.print_data()
-            with open("result.json", "a") as f:
-                print(",", file=f)
-                json.dump(ohlc, f)
         self.candle_start_1_min = self.candle_end_1_min
         self.candle_end_1_min += self.delta_1_min
 
@@ -84,9 +81,6 @@ class Aggregator:
             ohlc["asset"] = sym
             self.ohlc.add(ohlc)
             self.ohlc.print_data()
-            with open("result.json", "a") as f:
-                print(",", file=f)
-                json.dump(ohlc, f)
         self.candle_start_5_min = self.candle_end_5_min
         self.candle_end_5_min += self.delta_5_min
 
