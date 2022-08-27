@@ -11,14 +11,14 @@ import signal as sys_signal
 from threading import Event
 
 evt = Event()
-agg = Aggregator(evt)
-prices = agg.get_price_store()
-
-
 def handl():
     evt.set()
     rel.abort()
     print('Exit')
+
+
+agg = Aggregator(evt)
+prices = agg.get_price_store()
 
 # websocket.enableTrace(True)
 with ThreadPoolExecutor() as executor:
