@@ -11,19 +11,29 @@ class Aggregator:
         self.ohlc = OHLC_store()
         self.stop_event = event
         self.symbols = ["BTC", "ETH", "MATIC"]
-        self.delta_1_min = 60 
-        self.delta_5_min = 60 * 5  
+        self.delta_1_min = 60
+        self.delta_5_min = 60 * 5
         self.threshold = self.delta_1_min
         self.candle_start_1_min = int(datetime.now().timestamp())
         self.candle_end_1_min = self.candle_start_1_min + self.delta_1_min
         self.candle_start_5_min = int(datetime.now().timestamp())
         self.candle_end_5_min = self.candle_start_5_min + self.delta_5_min
 
-
     def get_price_store(self):
+        """
+        Returns the central price store
+        for observers
+        """
         return self.prices
 
     def get_candles(self, prices, delta, market):
+        """
+        Returns an OHLC object
+        Args:
+            prices: copy of prices for a symbol
+            delta : time delta be it 1 min or 5 min
+            market : symbol of instrument
+        """
         count = 0
         price_high = -float("inf")
         price_low = float("inf")
@@ -60,6 +70,9 @@ class Aggregator:
         return ohlc
 
     def candles_1_min(self):
+        """
+        Wrapper function for 1 min candles
+        """
         for sym in self.symbols:
             print("AGGREGATOR", sym)
             latest = self.prices[sym]
@@ -73,6 +86,9 @@ class Aggregator:
         self.candle_end_1_min += self.delta_1_min
 
     def candles_5_min(self):
+        """
+        Wrapper function for 5 min candles
+        """
         for sym in self.symbols:
             print("AGGREGATOR", sym)
             latest = self.prices[sym]
@@ -85,6 +101,9 @@ class Aggregator:
         self.candle_end_5_min += self.delta_5_min
 
     def calculate(self):
+        """
+        Main function which runs infinitely and generate candles
+        """
         try:
             while True:
                 if self.stop_event.is_set():
