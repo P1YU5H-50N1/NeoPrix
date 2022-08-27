@@ -11,14 +11,14 @@ class Aggregator:
         self.ohlc = OHLC_store()
         self.stop_event = event
         self.symbols = ["BTC", "ETH", "MATIC"]
-        self.delta_1_min = 15#60  # 60
-        self.delta_5_min = 30#60 * 5  # 60*5
+        self.delta_1_min = 60 
+        self.delta_5_min = 60 * 5  
         self.threshold = self.delta_1_min
         self.candle_start_1_min = int(datetime.now().timestamp())
         self.candle_end_1_min = self.candle_start_1_min + self.delta_1_min
         self.candle_start_5_min = int(datetime.now().timestamp())
         self.candle_end_5_min = self.candle_start_5_min + self.delta_5_min
-        # self.candles_1_min = []
+
 
     def get_price_store(self):
         return self.prices
