@@ -5,5 +5,5 @@ A python script which generates OHLC data by fetching realtime trade data of BTC
 1.  Clone the repo
 2.  Install pipenv by `pip install pipenv` or visit [here](https://pypi.org/project/pipenv/) to know more about installing pipenv.
 3.  Navigate to project directory and run `pipenv shell`, it will create a virtual env.
-4.  Run `pipenv shell` and this will install the required libraries.
+4.  Run `pipenv install` and this will install the required libraries.
 5.  Run `python main.py`
