@@ -114,7 +114,7 @@ class Aggregator:
                     self.candles_5_min()
 
                 else:
-                    time.sleep(
+                     self.stop_event.wait(
                         max(self.candle_end_1_min - int(datetime.now().timestamp()), 0)
                     )
 
